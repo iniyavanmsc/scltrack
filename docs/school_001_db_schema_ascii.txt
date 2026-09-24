@@ -1,0 +1,199 @@
+                                        SCHOOL_001_DB
+                           Multi-Tenant School Bus Tracking Schema
+===========================================================================================
+
+
++--------------------------+                          +------------------------------+
+|         PARENTS          |                          |        NOTIFICATIONS         |
++--------------------------+                          +------------------------------+
+| id (PK)                  |                          | id (PK)                      |
+| full_name                |                          | title                        |
+| phone (UQ)               |                          | message                      |
+| email                    |                          | notification_type            |
+| address                  |                          | channel                      |
+| emergency_contact_name   |                          | is_read                      |
+| emergency_contact_phone  |                          | read_at                      |
+| is_active                |                          | sent_at                      |
+| created_by_id            |                          | payload                      |
+| updated_by_id            |                          | created_by_id                |
+| created_at               |                          | updated_by_id                |
+| updated_at               |                          | created_at                   |
++------------+-------------+                          | updated_at                   |
+             |                                        +------------------------------+
+             |
+             | One Parent has Many Students
+             v
++--------------------------+       Many Students belong to One Class/Section
+|         STUDENTS         |<-----------------------------------------------+
++--------------------------+                                                |
+| id (PK)                  |                                                |
+| admission_no (UQ)        |                                                |
+| full_name                |                                                |
+| parent_id (FK)           |                                                |
+| class_section_id (FK)    |                                                |
+| class_name               |                                                |
+| section                  |                                                |
+| pickup_address           |                                                |
+| drop_address             |                                                |
+| is_active                |                                                |
+| created_by_id            |                                                |
+| updated_by_id            |                                                |
+| created_at               |                                                |
+| updated_at               |                                                |
++------------+-------------+                                                |
+             |                                                              |
+             | One Student has Many Assignments                             |
+             v                                                              |
++-------------------------------+                            +--------------+---------------+
+| STUDENT_VEHICLE_ASSIGNMENTS   |                            |       CLASS_SECTIONS        |
++-------------------------------+                            +------------------------------+
+| id (PK)                       |                            | id (PK)                      |
+| student_id (FK)               |                            | class_name                   |
+| vehicle_id (FK)               |                            | section                      |
+| route_id (FK)                 |                            | is_active                    |
+| stop_id (FK)                  |                            | created_by_id                |
+| is_active                     |                            | updated_by_id                |
+| created_by_id                 |                            | created_at                   |
+| updated_by_id                 |                            | updated_at                   |
+| created_at                    |                            +------------------------------+
+| updated_at                    |
++-----+-------------------+-----+
+      |                   |
+      | Many belong to    | Many belong to
+      | One Vehicle       | One Vehicle Route
+      v                   v
+
++--------------------------+      +--------------------------+      +--------------------------+
+|         VEHICLES         |      |      VEHICLE_ROUTES      |      |          STOPS           |
++--------------------------+      +--------------------------+      +--------------------------+
+| id (PK)                  |      | id (PK)                  |<-----| route_id (FK)            |
+| vehicle_number (UQ)      |      | route_name               |      | id (PK)                  |
+| registration_number (UQ) |      | route_code (UQ)          |      | stop_name                |
+| is_active                |      | trip_type                |      | stop_code (UQ)           |
+| created_by_id            |      | start_location           |      | latitude                 |
+| updated_by_id            |      | end_location             |      | longitude                |
+| created_at               |      | is_active                |      | stop_order               |
+| updated_at               |      | created_by_id            |      | is_active                |
++-----+--------------------+      | updated_by_id            |      | created_by_id            |
+      |                           | created_at               |      | updated_by_id            |
+      |                           | updated_at               |      | created_at               |
+      |                           +-----+--------------------+      | updated_at               |
+      |                                 |                           +--------------------------+
+      |                                 |
+      |                                 | One Vehicle Route has Many Stops
+      |                                 | One Vehicle Route has Many Driver Assignments
+      |                                 v
+      |                  +----------------------------------+
+      |                  |     DRIVER_ROUTE_ASSIGNMENTS     |
+      |                  +----------------------------------+
+      |                  | id (PK)                          |
+      |                  | driver_id (FK)                   |
+      |                  | vehicle_id (FK)                  |
+      |                  | route_id (FK)                    |
+      |                  | assigned_from                    |
+      |                  | assigned_to                      |
+      |                  | is_active                        |
+      |                  | created_by_id                    |
+      |                  | updated_by_id                    |
+      |                  | created_at                       |
+      |                  | updated_at                       |
+      |                  +----------------+-----------------+
+      |                                   ^
+      |                                   |
+      |                                   | Many assignments belong to
+      |                                   | One Admin/Driver
+      |                                   |
+      |                    +--------------+---------------+
+      |                    |       ADMIN_AND_DRIVERS      |
+      |                    +------------------------------+
+      |                    | id (PK)                      |
+      |                    | full_name                    |
+      |                    | phone                        |
+      |                    | email_id (UQ)                |
+      |                    | username (UQ)                |
+      |                    | password                     |
+      |                    | user_role                    |
+      |                    | license_number (UQ)          |
+      |                    | license_expiry_date          |
+      |                    | address                      |
+      |                    | is_active                    |
+      |                    | created_by_id                |
+      |                    | updated_by_id                |
+      |                    | created_at                   |
+      |                    | updated_at                   |
+      |                    +--------------+---------------+
+      |                                   |
+      |                                   | One Admin/Driver has Many Trips
+      +-----------------------------------+
+                                          |
+                                          | One Vehicle has Many Trips
+                                          | One Vehicle Route has Many Trips
+                                          v
+                            +----------------------------------+
+                            |           ACTIVE_TRIPS           |
+                            +----------------------------------+
+                            | id (PK)                          |
+                            | route_id (FK)                    |
+                            | vehicle_id (FK)                  |
+                            | driver_id (FK)                   |
+                            | trip_date                        |
+                            | trip_status                      |
+                            | started_at                       |
+                            | ended_at                         |
+                            | notes                            |
+                            | created_by_id                    |
+                            | updated_by_id                    |
+                            | created_at                       |
+                            | updated_at                       |
+                            +---------------+------------------+
+                                            |
+                  +-------------------------+--------------------------+
+                  |                                                    |
+                  | One Active Trip has Live Location Rows             | One Active Trip has Many History Rows
+                  v                                                    v
+
+         +-------------------------------+                 +----------------------------------+
+         |    LIVE_VEHICLE_LOCATIONS     |                 |    VEHICLE_LOCATION_HISTORY      |
+         +-------------------------------+                 +----------------------------------+
+         | id (PK)                       |                 | id (PK)                          |
+         | vehicle_id (FK, UQ)           |                 | vehicle_id (FK)                  |
+         | active_trip_id (FK)           |                 | active_trip_id (FK)              |
+         | latitude                      |                 | latitude                         |
+         | longitude                     |                 | longitude                        |
+         | speed                         |                 | speed                            |
+         | heading                       |                 | heading                          |
+         | ignition_on                   |                 | ignition_on                      |
+         | recorded_at                   |                 | recorded_at                      |
+         | created_by_id                 |                 | raw_payload                      |
+         | updated_by_id                 |                 | created_by_id                    |
+         | created_at                    |                 | updated_by_id                    |
+         | updated_at                    |                 | created_at                       |
+         +-------------------------------+                 | updated_at                       |
+                                                           +----------------------------------+
+
+
+RELATION SUMMARY
+===========================================================================================
+PARENTS                  1 -> Many  STUDENTS
+CLASS_SECTIONS           1 -> Many  STUDENTS
+STUDENTS                 1 -> Many  STUDENT_VEHICLE_ASSIGNMENTS
+VEHICLES                 1 -> Many  STUDENT_VEHICLE_ASSIGNMENTS
+VEHICLE_ROUTES           1 -> Many  STUDENT_VEHICLE_ASSIGNMENTS
+STOPS                    1 -> Many  STUDENT_VEHICLE_ASSIGNMENTS
+VEHICLE_ROUTES           1 -> Many  STOPS
+ADMIN_AND_DRIVERS        1 -> Many  DRIVER_ROUTE_ASSIGNMENTS
+VEHICLES                 1 -> Many  DRIVER_ROUTE_ASSIGNMENTS
+VEHICLE_ROUTES           1 -> Many  DRIVER_ROUTE_ASSIGNMENTS
+ADMIN_AND_DRIVERS        1 -> Many  ACTIVE_TRIPS
+VEHICLES                 1 -> Many  ACTIVE_TRIPS
+VEHICLE_ROUTES           1 -> Many  ACTIVE_TRIPS
+VEHICLES                 1 -> 1     LIVE_VEHICLE_LOCATIONS
+ACTIVE_TRIPS             1 -> Many  LIVE_VEHICLE_LOCATIONS
+VEHICLES                 1 -> Many  VEHICLE_LOCATION_HISTORY
+ACTIVE_TRIPS             1 -> Many  VEHICLE_LOCATION_HISTORY
+NOTIFICATIONS            Standalone
+
+
+OTHER TENANT TABLES
+===========================================================================================
+cache, cache_locks, failed_jobs, jobs, job_batches, migrations, password_reset_tokens, sessions

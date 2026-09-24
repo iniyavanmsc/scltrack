@@ -1,0 +1,31 @@
++ Thought: 8.7s
+Analysis Complete — Admin Pages Change List
+I explored the full project (Laravel 12, Blade + Bootstrap, multi-tenant, no Livewire/React yet). Here's what your admin control pages need, prioritized:
+Critical gaps
+1. No Dashboard — Root / just redirects to parents. You need a stats page (total students, buses on trip, active drivers, live locations, alerts). This is the biggest missing admin surface.
+2. Roles are NOT enforced — 5 roles exist (super admin, transport admin, data entry staff, cab drivers, cab assistant) but every login sees the same menu and all CRUD. Add role checks (middleware or policies) so drivers see only trips/their route; data-entry staff can't delete, etc.
+3. Attendance module — entirely missing — No table, controller, views, or menu item. Needed for the pickup/drop workflow your RN app will call.
+4. Notifications exist but unusable — notifications table + TenantNotification model exist, but no routes/views/admin UI/nav entry. Wire it up (parent/driver alerts for pickup/drop/trip start).
+Tracking module (core of the app)
+5. Live Vehicle Locations is static CRUD — just a table to type lat/lng manually. You need:
+- A map view (Leaflet/Google) on the index page showing vehicles
+- A GPS ingest API endpoint (POST /api/v1/locations) that the driver's React Native app hits
+- Ward trips → live feed; show only vehicles on active trips
+6. Vehicle Location History — same problem; table-only. Add a route shows a vehicle's path on a map + filtering by date/trip.
+Data issues
+7. Schema drift — Code uses student_route_assignments (no vehicle_id); docs show STUDENT_VEHICLE_ASSIGNMENTS. Verify against live DB and reconcile. Also note the assignment model doesn't store vehicle — that's needed to know which bus a student rides.
+8. Pickup/Drop are free-text columns on students. Convert to stop-based pickup/drop so parents get "bus arrived at stop X" notifications. At minimum add pickup/drop stop + time fields on assignment.
+9. No migrations — database/migrations/tenant/ is empty; schema lives only in docs/. You can't deploy/version the DB. This will block you when you ship.
+New/missing admin pages
+10. Driver–Route Assignments — table + model exist (driver_route_assignments) but no admin page. Needed so drivers are bound to routes.
+11. Schools/multi-tenant switch — no schools table; tenant DB is hardcoded to school_001_db. If you plan multiple schools, add it now before going to production.
+Priority order to implement
+1. Role enforcement + menu by role → 
+2. Active-trips becomes the driver "start trip → GPS begins" flow + location ingest API → 
+3. Map views for Live/History → 
+4. Dashboard → 
+5. Attendance + Notifications → 
+6. Fix schema drift + migrations → 
+7. Driver-route assignments → 
+8. Multi-school.
+Want me to start on any of these? I'd suggest roles/menu gating + the GPS ingest API + map on Live Locations first since they unblock the React Native driver/parent apps.
